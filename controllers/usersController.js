@@ -108,7 +108,7 @@ const getAllOrderUser = catchAsync(async (req, res, next) => {
         include: [
           {
             model: ProductsInCart,
-            attributes: ['id', 'quantity'],
+            attributes: ['id', 'quantity', 'status'],
             include: [{ model: Product, attributes: ['price', 'title'] }],
           },
         ],
@@ -132,7 +132,7 @@ const getOrderUserById = catchAsync(async (req, res, next) => {
         include: [
           {
             model: ProductsInCart,
-            attributes: ['id', 'quantity'],
+            attributes: ['id', 'quantity', 'status'],
             include: [{ model: Product, attributes: ['price', 'title'] }],
           },
         ],

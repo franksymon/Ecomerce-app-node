@@ -177,9 +177,11 @@ const purchaseProductInCart = catchAsync(async (req, res, next) => {
   const cartPromises = cartData.productsInCarts.map(async e => {
     const updateQuantity = e.product.quantity - e.quantity;
 
-    console.log(e.product.quantity, e.quantity, updateQuantity);
+    const quantiyInv = e.product.quantity;
+    console.log(e.product.quantity, e.quantity, updateQuantity, quantiyInv);
 
-    await e.product.quantity.update({ quantity: updateQuantity });
+    //NO ACTUALIZA msg "quantiyInv.update is not a function"
+    //await quantiyInv.update({ quantity: updateQuantity });
 
     const productPrice = e.quantity * parseInt(e.product.price);
     totalPrice += productPrice;
@@ -196,7 +198,7 @@ const purchaseProductInCart = catchAsync(async (req, res, next) => {
     totalPrice,
   });
 
-  // await cartData.update({ status: 'purchased' });
+  await cartData.update({ status: 'purchased' });
 
   res.status(201).json({ status: 'success', newOrder });
 });
@@ -207,20 +209,25 @@ const deletedProductCart = catchAsync(async (req, res, next) => {
 
   const cartData = await Cart.findOne({
     where: { userId: sessionUser.id, status: 'active' },
-    include: [
-      {
-        model: ProductsInCart,
-        status: 'active',
-        id: productInCartId,
-      },
-    ],
   });
 
   if (!cartData) {
-    return next(new AppError('This user does not have a cart yet.', 400));
+    return next(new AppError('Cart no Exits', 400));
   }
 
-  //await productCart.update({ status: 'removed' });
+  const productInCart = await ProductsInCart.findOne({
+    where: {
+      cartId: cartData.id,
+      productId: productInCartId,
+      status: 'active',
+    },
+  });
+
+  if (!productInCart) {
+    return next(new AppError('The product does not exist in the cart', 400));
+  }
+
+  await productInCart.update({ quantity: 0, status: 'removed' });
 
   res.status(200).json({ status: 'success', cartData });
 });

@@ -17,9 +17,24 @@ const createUserValidations = [
     .withMessage('Password must be at least 8 characters long'),
 ];
 
-const createProductValidations = [];
-
-const createCategoryValidations = [];
+const createProductValidations = [
+  body('title').notEmpty().withMessage('Title cannot be empty'),
+  body('description')
+    .notEmpty()
+    .withMessage('Description cannot be empty')
+    .isLength({ max: 100 })
+    .withMessage('comments must be maximum 100 characters'),
+  body('price')
+    .notEmpty()
+    .withMessage('Price cannot be empty')
+    .isFloat({ min: 0 })
+    .withMessage('Invalide value'),
+  body('quantity')
+    .notEmpty()
+    .withMessage('Quantity cannot be empty')
+    .isInt({ min: 0 })
+    .withMessage('Quantity must be integer'),
+];
 
 const checkValidations = (req, res, next) => {
   const errors = validationResult(req);
